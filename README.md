@@ -37,8 +37,8 @@ There's 2 crawlers--
 * *getEventData()*: the biggest function, where most of the data is being selected for. Most of the data is fairly easy to access, but some fields are much more difficult to get consistently
   * address: hard, different formattings and/or missing fields are common, (multiple "|" characters, missing street address, etc.)
   * date: very hard, especially with date ranges and recurring events
-  * recurring: Hard. I took a little creative liberty and made the recurring field an array of size 7 that represents the days of the week on which the event is recurring.
-    * for example, if the recurring field = [1, 0, 0, 0, 0, 1, 1], then the event is recurring on Friday, Saturday, and Sunday.
+  * recurring: Hard. I took a little creative liberty and made the recurring field an array of size 7 that represents the days of the week on which the event is recurring. (index 0 is sunday, index 6 in saturday)
+    * for example, if the recurring field = [1, 0, 0, 0, 0, 1, 1], then the event is recurring on Friday, Saturday, and Sunday. 
     * this array is used by the dateRangeParser()
 * *parseDate()*: called by the getEventData() to process the raw date information into pretty start/end times
   * processes the 4 types of dates found on the website:
