@@ -5,29 +5,35 @@ const moment = require('moment');
 
 Apify.main(async () => {
 
-    const requestQueue = await Apify.openRequestQueue();
-    const eventQueue = await Apify.openRequestQueue('eventQueue');
+  //requestQueue used by first crawler to paginate
+  const requestQueue = await Apify.openRequestQueue();
 
-    //starting url
-    requestQueue.addRequest({ url: 'https://www.visithoustontexas.com/events/'});
+  //eventQueue, used by second crawler (eventCrawler) to get data from event pages
+  const eventQueue = await Apify.openRequestQueue('eventQueue');
 
-//******************************************************************************
+  //starting url
+  requestQueue.addRequest({ url: 'https://www.visithoustontexas.com/events/'});
+
+//*****************************************************************************
+//** phase I -- crawl through pages searching for as many events as possible ***
+//*****************************************************************************
   // Create crawler
 const crawler = new Apify.PuppeteerCrawler({
     requestQueue,
     handlePageFunction:  async ({ request, page }) => {
 
-
+      //add the next page to the requestQueue to continue pagination
         try {
-          await page.waitFor('a.arrow.next');
+          await page.waitFor('a.arrow.next'); //wait for the next arrow to load
           await Apify.utils.enqueueLinks({
             page,
-            selector: 'a.arrow.next',
+            selector: 'a.arrow.next', //add the next page to the requestQueue
             requestQueue });
         } catch {
-          console.log("failed to add links to queue");
+          console.log("caught something");
         }
 
+        //add the event links to the eventQueue, to later be processed by a different crawler
         try {
           await page.waitFor('div.item-int > div.info > div.title a');
           await Apify.utils.enqueueLinks({
@@ -35,41 +41,41 @@ const crawler = new Apify.PuppeteerCrawler({
             selector: 'div.item-int > div.info > div.title a',
             requestQueue: eventQueue });
         } catch {
-          console.log("failed to add links to eventQueue");
+          console.log("caught something");
         }
 
   }, //end handlePageFunction
-}); // end crawler
+}); // end crawler declaration
 
-// Run link crawler.
-try {
-    await crawler.run();
-} catch {
-    console.log("error was encountered while running crawler");
-}
+  // Run crawler
+  try {
+      await crawler.run();
+  } catch {
+      console.log("error was encountered while running crawler");
+  }
 
 //*****************************************************************************
 //********* phase II -- get data from the events in the eventQueue ************
 //*****************************************************************************
 
-// Create 2nd crawler to run through individual events in eventQueue
-const eventCrawler = new Apify.PuppeteerCrawler({
-    requestQueue: eventQueue,
-    handlePageFunction: getEventData,
-}); // end crawler
+  // Create 2nd crawler to run through individual events in eventQueue
+  const eventCrawler = new Apify.PuppeteerCrawler({
+      requestQueue: eventQueue,
+      handlePageFunction: getEventData,
+  }); // end crawler
 
-// Run link crawler.
-try {
-    await eventCrawler.run();
-} catch {
-    console.log("error was encountered while running crawler");
-}
+  // Run event crawler
+  try {
+      await eventCrawler.run();
+  } catch {
+      console.log("error was encountered while running event crawler");
+  }
 
 });//end Apify.main
 
 
 //*****************************************************************************
-//function called by crawler to get event data from a specific event page
+//function called by eventCrawler to get event data from a specific event page
 const getEventData = async ({ page, request }) => {
 
 //the event object declared and initialized
@@ -108,6 +114,8 @@ const getEventData = async ({ page, request }) => {
 
   //temporary variable for the raw 'address' field
   const address = await $wrapper.$eval('.adrs', (el => el.textContent));
+
+  //location variable in case address field is null
   const location = await $wrapper.$eval('.location', (el => el.textContent));
 
   //parsing the raw address field into street, city, state, and zip code
@@ -180,14 +188,14 @@ const getEventData = async ({ page, request }) => {
     }
   }
 
-  if (await recurring.includes(1)){
+  if (recurring.includes(1)){
     event.recurring = recurring;
   } else {
     event.recurring = "Not recurring";
   }
 
   //calls the parseDate function
-  event.date = parseDate(rawDate, event.time, recurring);
+  event.date = await parseDate(rawDate, event.time, recurring);
 
   // timestamp (when event was processed)
   event.timestamp = new Date();
@@ -312,7 +320,7 @@ function dateRangeParser(startDate, endDate, rawTime, recurring){
   var difference = shortEndTime.diff(shortStartTime, 'days')+1;
 
   for (var i = 0; i<difference; i++){
-    if(!i==0){ //if it's not the first run through the loop
+    if(!(i==0)){ //if it's not the first run through the loop
       shortStartTime.add('days', 1); //+1 day to start time
       if(recurring[shortStartTime.day()]==1){
         var parsedStartTime = [shortStartTime.get('year'), shortStartTime.get('month'), shortStartTime.get('date'), startHour, startMinute];
@@ -322,7 +330,7 @@ function dateRangeParser(startDate, endDate, rawTime, recurring){
     } else { //if it's the first loop, dont add a day
       if(recurring[shortStartTime.day()]==1){
         var parsedStartTime = [shortStartTime.get('year'), shortStartTime.get('month'), shortStartTime.get('date'), startHour, startMinute];
-        var parsedStartTime = [shortStartTime.get('year'), shortStartTime.get('month'), shortStartTime.get('date'), endHour, endMinute];
+        var parsedEndTime = [shortStartTime.get('year'), shortStartTime.get('month'), shortStartTime.get('date'), endHour, endMinute];
         dateRange.push(momentify(parsedStartTime, parsedEndTime));
       }
     }
