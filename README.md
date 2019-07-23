@@ -24,7 +24,7 @@ node main.js
 
 ## code explained
 
-There's 2 crawlers...
+There's 2 crawlers--
  
 * The first crawler starts at https://www.visithoustontexas.com/events/, gets all the event links it can find, then goes to the next page it can find (/events?page=2), and repeats until it runs out of pages. Whenever it finds an event link, it adds it to the "eventQueue", a separate requestQueue.
 
