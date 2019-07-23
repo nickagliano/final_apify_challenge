@@ -53,3 +53,11 @@ There's 2 crawlers--
      * for example, if a range of dates was given: *Aug. 1st - Aug. 25th, Recurring weekly Saturday, Sunday*, the dateRangeParser would only return the dates which are Saturdays or Sundays between Aug. 1st and Aug. 25th
 
 * *momentify()*: takes an array in the form of [year, month, day, hour, minute] and returns an ISO formatted string
+
+### notes/things to improve on
+* there's 365 lines of code. a lot are comments, but still there could be a lot less
+  * the string parsing is the most complicated part of the crawler, and there's a lot of fringe cases to account for. there's probably better, more robust ways to parse the fields that have less structure (like the address, time, and date fields)
+* most of the errors are from trying to use data that wasn't found on the page or because of inconsistent formatting
+  * str.split() of strings that don't exist, missing ':' in start times and end times fields, weird formatting of addresses, etc.
+* in the end, 10 events out of ~230 could not be processed (reached max retry count because of errors during getEventData() function)
+* this was a very fun project filled with learning new skills and technologies :)
