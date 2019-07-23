@@ -30,7 +30,7 @@ There's 2 crawlers...
 
 * After the first crawler exhausts its queue, the second crawler starts to work through the eventQueue, which has just been populated with all of the event links. On each event page, the getEventData function is called. 
 
-# functions
+### functions
 
 * getEventData()
 
