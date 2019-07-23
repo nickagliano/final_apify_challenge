@@ -43,8 +43,8 @@ There's 2 crawlers--
     * date ranges that reoccur only on specific days of the week
   * dates can have start times and end times, only start times, or neither
   * if a date range is encountered, it's passed to the dateRangeParser() function
-* *dateRangeParser()*: interprets the range of dates given into individual dates
+* *dateRangeParser()*: interprets the range of dates given and returns the appropriate individual dates
    * returns dates only if they're said to be recurring on that day
      * for example, if a range of dates was given: *Aug. 1st - Aug. 25th, Recurring weekly Saturday, Sunday*, the dateRangeParser would only return the dates which are Saturdays or Sundays between Aug. 1st and Aug. 25th
 
-* *momentify()*:
+* *momentify()*: takes an array in the form of [year, month, day, hour, minute] and returns an ISO formatted string
