@@ -60,5 +60,6 @@ there's 2 crawlers --
 * most of the errors are from trying to use data that wasn't found on the page or because of inconsistent formatting
   * str.split() of strings that don't exist, missing ':' in start times and end times fields, weird formatting of addresses, etc.
 * in the end, 10 events out of ~230 could not be processed (reached max retry count because of errors during getEventData() function)
+* when an event has a recurring field (Recurring weekly on Friday), but no date range, the program doesn't add any dates for that event. it would be better if it defaulted to adding dates on every Friday for a default date range (the next 3 months or something like that)
 * this was a very fun project filled with learning new skills and technologies :)
 * string parsing is hard
