@@ -1,0 +1,25 @@
+{
+	"name": "apify_scraper_challenge",
+	"version": "1.0.0",
+	"description": "Crawl a number of web pages using headless Chrome and Puppeteer",
+	"main": "main.js",
+	"dependencies": {
+		"apify": "^0.15.2",
+		"moment": "^2.24.0",
+		"rimraf": "^2.6.3",
+		"util": "^0.11.1"
+	},
+	"devDependencies": {},
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"del": "rimraf apify_storage/datasets/default/* && rimraf apify_storage/key_value_stores/event-links/*",
+		"dequeue": "rimraf apify_storage/request_queues/default/handled/* && rimraf apify_storage/request_queues/default/pending/* && rimraf apify_storage/request_queues/eventQueue/pending/* && rimraf apify_storage/request_queues/eventQueue/handled/*"
+	},
+	"repository": {
+		"type": "git",
+		"url": ""
+	},
+	"author": "",
+	"license": "ISC",
+	"homepage": ""
+}

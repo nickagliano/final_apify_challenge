@@ -1,0 +1,7 @@
+{
+	"name": "apify_scraper_challenge",
+	"version": "0.1",
+	"buildTag": "latest",
+	"env": null,
+	"template": "puppeteer_crawler"
+}
