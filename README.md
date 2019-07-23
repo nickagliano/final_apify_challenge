@@ -61,3 +61,4 @@ there's 2 crawlers --
   * str.split() of strings that don't exist, missing ':' in start times and end times fields, weird formatting of addresses, etc.
 * in the end, 10 events out of ~230 could not be processed (reached max retry count because of errors during getEventData() function)
 * this was a very fun project filled with learning new skills and technologies :)
+* string parsing is hard
