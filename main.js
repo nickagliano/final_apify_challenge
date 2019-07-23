@@ -94,11 +94,11 @@ const getEventData = async ({ page, request }) => {
       timestamp: null
    }
 
-  //grabs the div which holds info about title, date, contact, time, recurring, place
-  const $wrapper = await page.$('div.detail-c2');
-
   //url
   event.url = request.url;
+
+  //grabs the div which holds info about title, date, contact, time, recurring, place
+  const $wrapper = await page.$('div.detail-c2');
 
   //event title
   event.title = await $wrapper.$eval('h1', (el => el.textContent));
@@ -180,7 +180,7 @@ const getEventData = async ({ page, request }) => {
     }
   }
 
-  if (recurring.includes(1)){
+  if (await recurring.includes(1)){
     event.recurring = recurring;
   } else {
     event.recurring = "Not recurring";
@@ -270,10 +270,7 @@ function parseDate(rawDate, rawTime, recurring) {
 // -- startDate, start date in the form 'month_name MM, YYYY' (ex: "July 21, 2019")
 // -- endDate, end date in the form 'month_name MM, YYYY' (ex: "July 28, 2019")
 // -- rawTime, the raw string parsed from event page (ex: "8:00 PM to 10:30 PM")
-// -- recurring, the raw string parsed from the event page (ex: "Recurring daily")
-// **
-// -- to be added: recurring only on certain days of the week,
-//    -- (right now it just assumes recurring events are daily)
+// -- recurring, an array of days that events are recurring on, Sun-Sat = 0-6)
 function dateRangeParser(startDate, endDate, rawTime, recurring){
 
   //tokenizing of the raw startDate into year, month, and day
