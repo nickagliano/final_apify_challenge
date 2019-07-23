@@ -32,10 +32,19 @@ There's 2 crawlers--
 
 ### functions
 
-* getEventData()
+* *getEventData()*: the biggest function, where most of the data is being selected for. Most of the data is fairly easy to access, but some fields are much more difficult to get consistently
+  * address: hard, different formattings and/or missing fields are common, (multiple "|" characters, missing street address, etc.)
+  * date: very hard, especially with date ranges and recurring events
+* *parseDate()*: called by the getEventData() to process the raw date information into pretty start/end times
+  * processes the 4 types of dates found on the website:
+    * specific dates
+    * multiple specific dates
+    * date ranges that reoccur daily
+    * date ranges that reoccur only on specific days of the week
+  * dates can have start times and end times, only start times, or neither
+  * if a date range is encountered, it's passed to the dateRangeParser() function
+* *dateRangeParser()*: interprets the range of dates given into individual dates
+   * returns dates only if they're said to be recurring on that day
+     * for example, if a range of dates was given: *Aug. 1st - Aug. 25th, Recurring weekly Saturday, Sunday*, the dateRangeParser would only return the Saturdays and Sundays between Aug. 1st and Aug. 25th
 
-* parseDate()
-
-* dateRangeParser()
-
-* momentify()
+* *momentify()*:
