@@ -45,6 +45,6 @@ There's 2 crawlers--
   * if a date range is encountered, it's passed to the dateRangeParser() function
 * *dateRangeParser()*: interprets the range of dates given into individual dates
    * returns dates only if they're said to be recurring on that day
-     * for example, if a range of dates was given: *Aug. 1st - Aug. 25th, Recurring weekly Saturday, Sunday*, the dateRangeParser would only return the Saturdays and Sundays between Aug. 1st and Aug. 25th
+     * for example, if a range of dates was given: *Aug. 1st - Aug. 25th, Recurring weekly Saturday, Sunday*, the dateRangeParser would only return the dates which are Saturdays or Sundays between Aug. 1st and Aug. 25th
 
 * *momentify()*:
