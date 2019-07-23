@@ -30,11 +30,16 @@ There's 2 crawlers--
 
 * After the first crawler exhausts its queue, the second crawler starts to work through the eventQueue, which has just been populated with all of the event links. On each event page, the getEventData function is called. 
 
+* Event data is stored in the default datasets location
+
 ### functions
 
 * *getEventData()*: the biggest function, where most of the data is being selected for. Most of the data is fairly easy to access, but some fields are much more difficult to get consistently
   * address: hard, different formattings and/or missing fields are common, (multiple "|" characters, missing street address, etc.)
   * date: very hard, especially with date ranges and recurring events
+  * recurring: I took a little creative liberty and made the recurring field an array of size 7 that represents the days of the week which the event is recurring.
+    * for example, if the recurring field = [1, 0, 0, 0, 0, 1, 1], then the event is recurring on Friday, Saturday, and Sunday.
+    * this array is used by the dateRangeParser()
 * *parseDate()*: called by the getEventData() to process the raw date information into pretty start/end times
   * processes the 4 types of dates found on the website:
     * specific dates
