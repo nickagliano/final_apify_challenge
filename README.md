@@ -5,7 +5,7 @@
 ### 1. <b> clone the repo </b>
 
 ```bash
-git clone git@github.com:nickagliano/apify-challenge.git
+git clone git@github.com:nickagliano/final_apify-challenge.git
 ```
 
 ### 2. <b>navigate to project and download npm dependencies</b>
