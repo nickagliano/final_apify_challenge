@@ -188,13 +188,13 @@ const getEventData = async ({ page, request }) => {
     }
   }
 
-  if (recurring.includes(1)){
+  if (recurring.includes(1)){ //if there's at least one day that the event is recurring
     event.recurring = recurring;
   } else {
     event.recurring = "Not recurring";
   }
 
-  //calls the parseDate function
+  //calls the parseDate function, which returns the parsedDates (including parsed date ranges)
   event.date = await parseDate(rawDate, event.time, recurring);
 
   // timestamp (when event was processed)
@@ -209,9 +209,10 @@ const getEventData = async ({ page, request }) => {
 // parseDate is called by the getEventData function
 // Takes 3 parameters
 // -- rawDate: unparsed date string, can be one date, many dates, on a date range
-// -- rawTime
-// -- recurring
-// returns an array of parsed dates
+// -- rawTime: unparsed time string, ex: "7:00 PM to 10:00 PM"
+// -- recurring: unparsed recurring string, ex: "Recurring weekly on Friday"
+// **
+// function returns an array of parsed dates
 function parseDate(rawDate, rawTime, recurring) {
 
   //if there's many dates listed, tokenize them and store in dates array
@@ -266,6 +267,7 @@ function parseDate(rawDate, rawTime, recurring) {
       //call to momentify to parse dates into ISO format, and store them in dates array
       dates[x]=(momentify(parsedStartDate, parsedEndDate));
     }
+  //return the dates array, which now holds the dates parsed into ISO format using moment.js
   return dates;
 } //end parseDate function
 
@@ -293,23 +295,32 @@ function dateRangeParser(startDate, endDate, rawTime, recurring){
   var endMonth = moment().month(endTokens[0]).format("M") - 1; //1 indexed!!!
   var endDay = endTokens[1].substr(0,(endTokens[1].length-1));
 
-  if (rawTime) {
+  if (rawTime) { //if there was a time given for the event
       var timeTokens = rawTime.split(" to ");
-      var startHour = timeTokens[0].split(':')[0];
-      var startMinute = timeTokens[0].split(':')[1].substring(0,2);
-      var endHour = timeTokens[1].split(':')[0];
-      var endMinute = timeTokens[1].split(':')[1].substring(0,2);
-      // logic to adjust for 24 hour clock
-      if (timeTokens[0].indexOf('PM') > -1){ startHour = parseInt(startHour) + 12; }
-      if (timeTokens[1].indexOf('PM') > -1){ endHour = parseInt(endHour) + 12; }
-  } else {
+      if(timeTokens[1]){ //if there's a start AND end time
+        var startHour = timeTokens[0].split(':')[0];
+        var startMinute = timeTokens[0].split(':')[1].substring(0,2);
+        var endHour = timeTokens[1].split(':')[0];
+        var endMinute = timeTokens[1].split(':')[1].substring(0,2);
+        // logic to adjust for 24 hour clock
+        if (timeTokens[0].indexOf('PM') > -1){ startHour = parseInt(startHour) + 12; }
+        if (timeTokens[1].indexOf('PM') > -1){ endHour = parseInt(endHour) + 12; }
+      } else { //only a start time was given
+        var startHour = rawTime.split(':')[0];
+        var startMinute = rawTime.split(':')[1].substring(0,2);
+        var endHour = 0;
+        var endMinute = 0;
+        // logic to adjust for 24 hour clock
+        if (timeTokens[0].indexOf('PM') > -1){ startHour = parseInt(startHour) + 12; }
+      }
+  } else { //else, there was no start and end time given for the event
       var startHour = 0;
       var startMinute = 0;
       var endHour = 0;
       var endMinute = 0;
   }
 
-  //
+  //moment objects with just year, month, and day for use in calculations
   var shortStartTime = moment([startYear, startMonth, startDay]);
   var shortEndTime = moment([endYear, endMonth, endDay]);
 
@@ -319,9 +330,10 @@ function dateRangeParser(startDate, endDate, rawTime, recurring){
   //get difference between start and end dates to be the stop condition for for-loop
   var difference = shortEndTime.diff(shortStartTime, 'days')+1;
 
+  //where the range is actually parsed into individual days
   for (var i = 0; i<difference; i++){
     if(!(i==0)){ //if it's not the first run through the loop
-      shortStartTime.add('days', 1); //+1 day to start time
+      shortStartTime.add('days', 1); //+1 day
       if(recurring[shortStartTime.day()]==1){
         var parsedStartTime = [shortStartTime.get('year'), shortStartTime.get('month'), shortStartTime.get('date'), startHour, startMinute];
         var parsedEndTime = [shortStartTime.get('year'), shortStartTime.get('month'), shortStartTime.get('date'), endHour, endMinute];
@@ -335,7 +347,7 @@ function dateRangeParser(startDate, endDate, rawTime, recurring){
       }
     }
   }
-
+  //return the dateRange array, which now holds the indexed individual dates found within the date range inputed
   return {dateRange};
 } //end dateRangeParser function
 
